@@ -220,6 +220,15 @@ services:
       - internal
     depends_on:
       - api
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.node-server.rule=Host(`hyperdx.flowertop.xyz`)'
+      - 'traefik.http.routers.node-server.entrypoints=websecure'
+      - 'traefik.http.routers.node-server.tls.certresolver=myresolver'
+      - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
+      - 'traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)'
+      - 'traefik.http.routers.redirs.entrypoints=web'
+      - 'traefik.http.routers.redirs.middlewares=redirect-to-https'
   ch-server:
     image: clickhouse/clickhouse-server:23.8.8-alpine
     container_name: hdx-oss-ch-server
@@ -235,15 +244,6 @@ services:
       - .volumes/ch_data:/var/lib/clickhouse
       - .volumes/ch_logs:/var/log/clickhouse-server
     restart: on-failure
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.node-server.rule=Host(`hyperdx.flowertop.xyz`)'
-      - 'traefik.http.routers.node-server.entrypoints=websecure'
-      - 'traefik.http.routers.node-server.tls.certresolver=myresolver'
-      - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
-      - 'traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)'
-      - 'traefik.http.routers.redirs.entrypoints=web'
-      - 'traefik.http.routers.redirs.middlewares=redirect-to-https'
     networks:
       - internal
 networks:
